@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Modern Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+  background: #150a2e;
+}
+
+::-webkit-scrollbar-track {
+  background: #150a2e;
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #202063 0%, #764ba2 50%, #f093fb 100%);
+  border-radius: 10px;
+  border: 2px solid #150a2e;
+  box-shadow: 
+    inset 0 0 10px rgba(255, 255, 255, 0.1),
+    0 0 20px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+/* Firefox Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #202063 #150a2e;
+}
