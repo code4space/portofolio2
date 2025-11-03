@@ -124,7 +124,6 @@ const FluidDistortion = ({ className = '' }: FluidDistortionProps) => {
       <EffectComposer>
         <Fluid
           fluidColor="#667eea"
-          backgroundColor="transparent"
           showBackground={false}
           intensity={5}
           force={1}

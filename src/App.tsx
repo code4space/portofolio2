@@ -1,90 +1,18 @@
-
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, ExternalLink, Github, Linkedin, Mail, Menu, X } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { useEffect, useState } from 'react';
+import CustomCursor from './components/CustomCursor';
 import FluidDistortion from './components/FluidDistortion';
-
-const LiquidBlob = ({ delay = 0 }) => {
-  return (
-    <motion.div
-      className="absolute rounded-full blur-3xl opacity-30"
-      style={{
-        background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
-      }}
-      animate={{
-        scale: [1, 1.2, 1],
-        x: [0, 30, 0],
-        y: [0, -30, 0],
-        rotate: [0, 90, 0],
-      }}
-      transition={{
-        duration: 8,
-        delay,
-        repeat: Infinity,
-        ease: "easeInOut",
-      }}
-    />
-  );
-};
-
-const GlassCard = ({ children, className = '', delay = 0 }: any) => {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    setMousePosition({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
-
-  return (
-    <motion.div
-      ref={cardRef}
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: false }}
-      transition={{ delay }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className={`relative backdrop-blur-xl bg-white/5 rounded-3xl border border-white/20 overflow-hidden ${className}`}
-      style={{
-        boxShadow: isHovered
-          ? `0 0 60px rgba(102, 126, 234, 0.3), inset 0 0 60px rgba(255, 255, 255, 0.05)`
-          : '0 8px 32px rgba(0, 0, 0, 0.1)',
-      }}
-    >
-      {isHovered && (
-        <motion.div
-          className="absolute pointer-events-none"
-          style={{
-            left: mousePosition.x,
-            top: mousePosition.y,
-            width: 300,
-            height: 300,
-            background: 'radial-gradient(circle, rgba(102, 126, 234, 0.15) 0%, transparent 70%)',
-            transform: 'translate(-50%, -50%)',
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
-        />
-      )}
-      <div className="relative z-10">
-        {children}
-      </div>
-    </motion.div>
-  );
-};
+import Loading from './components/Loading';
+import GlassCard from './components/glassCard';
+import SocialIcon from './components/socialIcon';
 
 const Portfolio = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const { scrollYProgress } = useScroll();
   const backgroundColor = useTransform(
     scrollYProgress,
@@ -124,6 +52,71 @@ const Portfolio = () => {
     'MongoDB', 'PostgreSQL', 'AWS', 'Docker', 'Figma'
   ];
 
+  // Loading state management
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadAssets = async () => {
+      // Simulate progressive loading
+      const steps = [
+        { progress: 20, delay: 200 },
+        { progress: 40, delay: 400 },
+        { progress: 60, delay: 600 },
+        { progress: 80, delay: 400 },
+        { progress: 95, delay: 300 },
+        { progress: 100, delay: 200 },
+      ];
+
+      for (const step of steps) {
+        if (!isMounted) return;
+        await new Promise(resolve => setTimeout(resolve, step.delay));
+        if (isMounted) {
+          setLoadingProgress(step.progress);
+        }
+      }
+
+      // Wait a bit before hiding loader for smooth transition
+      if (isMounted) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        setIsLoading(false);
+      }
+    };
+
+    // Check if images are already loaded
+    const images = document.querySelectorAll('img');
+    const imagePromises = Array.from(images).map((img) => {
+      if (img.complete) return Promise.resolve();
+      return new Promise<void>((resolve) => {
+        img.onload = () => resolve();
+        img.onerror = () => resolve(); // Continue even if image fails
+      });
+    });
+
+    // Check if fonts are loaded
+    const initLoading = () => {
+      if (isMounted) {
+        loadAssets();
+      }
+    };
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(initLoading);
+    } else {
+      initLoading();
+    }
+
+    // Also wait for images
+    Promise.all(imagePromises).then(() => {
+      if (isMounted) {
+        setLoadingProgress(prev => prev < 100 ? 100 : prev);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   useEffect(() => {
     const handleScroll = () => {
       const sections = ['home', 'about', 'projects', 'contact'];
@@ -162,22 +155,14 @@ const Portfolio = () => {
       style={{ backgroundColor }}
       className="min-h-screen text-white overflow-hidden relative"
     >
+      {/* Loading Component */}
+      <Loading isLoading={isLoading} progress={loadingProgress} />
+
+      {/* Custom Cursor */}
+      <CustomCursor />
+
       {/* Fluid Distortion Effect */}
       <FluidDistortion />
-
-      {/* Liquid Background Blobs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-10">
-        <LiquidBlob delay={0} />
-        <div className="absolute top-1/4 right-1/4 w-96 h-96">
-          <LiquidBlob delay={2} />
-        </div>
-        <div className="absolute bottom-1/4 left-1/3 w-80 h-80">
-          <LiquidBlob delay={4} />
-        </div>
-        <div className="absolute top-1/2 left-1/4 w-72 h-72">
-          <LiquidBlob delay={6} />
-        </div>
-      </div>
 
       {/* Navigation */}
       <motion.nav
@@ -282,23 +267,23 @@ const Portfolio = () => {
             viewport={{ once: false }}
             transition={{ duration: 0.8 }}
           >
-             <motion.h1
-               className="text-6xl md:text-8xl font-bold mb-6"
-               animate={{
-                 backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-               }}
-               transition={{ duration: 5, repeat: Infinity }}
-               style={{
-                 backgroundImage: 'linear-gradient(90deg, #667eea, #764ba2, #f093fb, #4facfe, #667eea)',
-                 backgroundSize: '200% 200%',
-                 WebkitBackgroundClip: 'text',
-                 WebkitTextFillColor: 'transparent',
-                 backgroundClip: 'text',
-                 filter: 'drop-shadow(0 0 30px rgba(102, 126, 234, 0.5))',
-               }}
-             >
-               Creative Developer
-             </motion.h1>
+            <motion.h1
+              className="text-6xl md:text-8xl font-bold mb-6"
+              animate={{
+                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+              }}
+              transition={{ duration: 5, repeat: Infinity }}
+              style={{
+                backgroundImage: 'linear-gradient(90deg, #667eea, #764ba2, #f093fb, #4facfe, #667eea)',
+                backgroundSize: '200% 200%',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                filter: 'drop-shadow(0 0 30px rgba(102, 126, 234, 0.5))',
+              }}
+            >
+              Creative Developer
+            </motion.h1>
             <motion.p
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
@@ -507,23 +492,7 @@ const Portfolio = () => {
                 { icon: Linkedin, label: 'LinkedIn', href: '#' },
                 { icon: Mail, label: 'Email', href: 'mailto:hello@example.com' },
               ].map(({ icon: Icon, label, href }) => (
-                <motion.a
-                  key={label}
-                  href={href}
-                  whileHover={{ scale: 1.1, y: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="p-4 backdrop-blur-xl bg-white/10 rounded-full border border-white/20 hover:bg-white/20 transition-all"
-                  aria-label={label}
-                  style={{
-                    boxShadow: 'inset 0 0 20px rgba(255, 255, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.1)',
-                  }}
-                >
-                  <Icon size={24} />
-                </motion.a>
+                <SocialIcon key={label} Icon={Icon} label={label} href={href} />
               ))}
             </div>
           </motion.div>
