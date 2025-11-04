@@ -4,7 +4,9 @@ import { EffectComposer } from '@react-three/postprocessing';
 import { Fluid } from '@whatisjery/react-fluid-distortion';
 import { Suspense, useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import porscheModel from '../assets/stylized_planet/scene.gltf?url';
+
+// Use public asset path so relative paths in GLTF resolve correctly
+const model3D = '/assets/stylized_planet/scene.gltf';
 
 interface FluidDistortionProps {
   className?: string;
@@ -13,7 +15,7 @@ interface FluidDistortionProps {
 // === Model component with smooth parallax scroll ===
 const Model = ({ parallaxRef }: { parallaxRef: React.MutableRefObject<number> }) => {
   const groupRef = useRef<THREE.Group>(null);
-  const { scene } = useGLTF(porscheModel);
+  const { scene } = useGLTF(model3D);
 
   const currentY = useRef(0);
 
@@ -43,7 +45,7 @@ const Model = ({ parallaxRef }: { parallaxRef: React.MutableRefObject<number> })
 };
 
 // Preload model for performance
-useGLTF.preload(porscheModel);
+useGLTF.preload(model3D);
 
 // === Scene with Lights + Model ===
 const Scene3D = ({ parallaxRef }: { parallaxRef: React.MutableRefObject<number> }) => {
