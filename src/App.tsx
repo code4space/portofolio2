@@ -1,6 +1,6 @@
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, ExternalLink, Github, Linkedin, Mail, Menu, X } from 'lucide-react';
+import { ArrowRight, Briefcase, Code, ExternalLink, FileText, Github, Linkedin, Mail, Menu, MessageCircle, User, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import CustomCursor from './components/CustomCursor';
 import FluidDistortion from './components/FluidDistortion';
@@ -47,10 +47,36 @@ const Portfolio = () => {
     },
   ];
 
-  const skills = [
-    'React', 'TypeScript', 'Node.js', 'Python', 'GraphQL',
-    'MongoDB', 'PostgreSQL', 'AWS', 'Docker', 'Figma'
-  ];
+  // Tech Stack organized by categories
+  const techStack = {
+    frontend: [
+      { name: 'React', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg' },
+      { name: 'TypeScript', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg' },
+      { name: 'Tailwind CSS', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg' },
+      { name: 'Javascript', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg' },
+      { name: 'Next.js', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg' },
+      { name: 'React Native', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg' },
+      { name: 'Vue.js', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg' },
+      { name: 'Redux', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redux/redux-original.svg' },
+    ],
+    backend: [
+      { name: 'Node.js', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg' },
+      { name: 'Python', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg' },
+      { name: 'GraphQL', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/graphql/graphql-plain.svg' },
+      { name: 'Express', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg' },
+      { name: 'Bun', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bun/bun-original.svg' },
+    ],
+    database: [
+      { name: 'MongoDB', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg' },
+      { name: 'PostgreSQL', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg' },
+      { name: 'MsSql Server', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoftsqlserver/microsoftsqlserver-plain.svg' },
+    ],
+    tools: [
+      { name: 'Git', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg' },
+      { name: 'Docker', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg' },
+      { name: 'Figma', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg' },
+    ],
+  };
 
   // Loading state management
   useEffect(() => {
@@ -119,7 +145,7 @@ const Portfolio = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['home', 'about', 'projects', 'contact'];
+      const sections = ['home', 'about', 'techstack', 'projects', 'contact'];
       const scrollPosition = window.scrollY + 150;
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
@@ -181,39 +207,42 @@ const Portfolio = () => {
               backgroundSize: '200% auto',
             }}
           >
-            Portfolio
+            William
           </motion.div>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex gap-8">
-            {['Home', 'About', 'Projects', 'Contact'].map((item) => (
-              <motion.a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  const element = document.getElementById(item.toLowerCase());
-                  if (element) {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }
-                }}
-                whileHover={{ scale: 1.1 }}
-                className={`transition-all relative ${activeSection === item.toLowerCase()
-                  ? 'text-purple-400'
-                  : 'text-white/70 hover:text-white'
-                  }`}
-              >
-                {item}
-                {activeSection === item.toLowerCase() && (
-                  <motion.div
-                    layoutId="activeSection"
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-linear-to-r from-purple-400 to-pink-400"
-                    initial={false}
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
-              </motion.a>
-            ))}
+            {['Home', 'About', 'Tech Stack', 'Projects', 'Contact'].map((item) => {
+              const sectionId = item.toLowerCase().replace(/\s+/g, '');
+              return (
+                <motion.a
+                  key={item}
+                  href={`#${sectionId}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const element = document.getElementById(sectionId);
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                  whileHover={{ scale: 1.1 }}
+                  className={`transition-all relative ${activeSection === sectionId
+                    ? 'text-purple-400'
+                    : 'text-white/70 hover:text-white'
+                    }`}
+                >
+                  {item}
+                  {activeSection === sectionId && (
+                    <motion.div
+                      layoutId="activeSection"
+                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-linear-to-r from-purple-400 to-pink-400"
+                      initial={false}
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </motion.a>
+              );
+            })}
           </div>
 
           {/* Mobile Menu Button */}
@@ -235,23 +264,26 @@ const Portfolio = () => {
               className="md:hidden backdrop-blur-2xl bg-black/20 border-t border-white/10"
             >
               <div className="px-6 py-4 flex flex-col gap-4">
-                {['Home', 'About', 'Projects', 'Contact'].map((item) => (
-                  <a
-                    key={item}
-                    href={`#${item.toLowerCase()}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const element = document.getElementById(item.toLowerCase());
-                      if (element) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      }
-                      setMenuOpen(false);
-                    }}
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    {item}
-                  </a>
-                ))}
+                {['Home', 'About', 'Tech Stack', 'Projects', 'Contact'].map((item) => {
+                  const sectionId = item.toLowerCase().replace(/\s+/g, '');
+                  return (
+                    <a
+                      key={item}
+                      href={`#${sectionId}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const element = document.getElementById(sectionId);
+                        if (element) {
+                          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                        setMenuOpen(false);
+                      }}
+                      className="text-white/70 hover:text-white transition-colors"
+                    >
+                      {item}
+                    </a>
+                  );
+                })}
               </div>
             </motion.div>
           )}
@@ -260,7 +292,7 @@ const Portfolio = () => {
 
       {/* Hero Section */}
       <section id="home" className="relative min-h-screen flex items-center justify-center px-6 z-20">
-        <div className="max-w-7xl mx-auto text-center z-10">
+        <div className="max-w-6xl mx-auto z-10 relative">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -268,7 +300,7 @@ const Portfolio = () => {
             transition={{ duration: 0.8 }}
           >
             <motion.h1
-              className="text-6xl md:text-8xl font-bold mb-6"
+              className="text-6xl md:text-8xl font-bold mb-6 "
               animate={{
                 backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
               }}
@@ -288,7 +320,7 @@ const Portfolio = () => {
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="text-xl md:text-2xl text-white/70 mb-8 max-w-2xl mx-auto"
+              className="text-xl md:text-2xl text-white/70 mb-8 max-w-2xl mx-auto text-center"
             >
               Crafting immersive digital experiences with cutting-edge technology and innovative design
             </motion.p>
@@ -359,57 +391,195 @@ const Portfolio = () => {
             viewport={{ once: false }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-5xl md:text-6xl font-bold mb-12 bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              About Me
-            </h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              <GlassCard className="p-8" delay={0.1}>
-                <p className="text-lg text-white/80 mb-6 leading-relaxed">
-                  I'm a passionate full-stack developer with a keen eye for design and a love for creating
-                  seamless user experiences. With expertise in modern web technologies, I transform complex
-                  problems into elegant solutions.
-                </p>
-                <p className="text-lg text-white/80 leading-relaxed">
-                  When I'm not coding, you'll find me exploring new technologies, contributing to open-source
-                  projects, or capturing moments through photography.
-                </p>
-              </GlassCard>
-              <GlassCard className="p-8" delay={0.2}>
-                <h3 className="text-2xl font-semibold mb-6">Skills & Technologies</h3>
-                <div className="flex flex-wrap gap-3">
-                  {skills.map((skill) => (
-                    <motion.span
-                      key={skill}
-                      initial={{ opacity: 0, scale: 0 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      whileHover={{ scale: 1.1, y: -5 }}
-                      className="px-4 py-2 backdrop-blur-xl bg-white/10 rounded-full border border-white/20 hover:bg-white/20 transition-all"
-                      style={{
-                        boxShadow: 'inset 0 0 20px rgba(255, 255, 255, 0.05)',
-                      }}
-                    >
-                      {skill}
-                    </motion.span>
-                  ))}
-                </div>
-              </GlassCard>
+            <div className="flex items-center gap-4 mb-12">
+              <User className="text-purple-400 w-10 h-10 md:w-12 md:h-12" />
+              <h2 className="text-5xl md:text-6xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                About Me
+              </h2>
             </div>
+            <GlassCard className="p-8" delay={0.1}>
+              <p className="text-lg text-white/80 mb-6 leading-relaxed">
+                Hi, I'm a developer with over 2 years of experience building modern web
+                and mobile applications. I enjoy crafting clean, user-focused designs and turning
+                ideas into interactive digital experiences. I'm always exploring new technologies
+                to improve my skills and create better solutions.
+              </p>
+              <motion.a
+                href="/resume"
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.05, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-2 px-6 py-3 backdrop-blur-xl bg-white/10 rounded-full border border-white/20 hover:bg-white/20 transition-all w-fit ml-auto"
+                style={{
+                  boxShadow: 'inset 0 0 20px rgba(255, 255, 255, 0.05)',
+                }}
+              >
+                <FileText size={20} />
+                <span className="hidden sm:inline">View Resume</span>
+              </motion.a>
+            </GlassCard>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Tech Stack Section */}
+      <section id="techstack" className="relative py-32 px-6 z-20">
+
+        <div className="max-w-6xl mx-auto z-10 relative">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="flex items-center gap-4 mb-16"
+          >
+            <Code className="text-purple-400 w-10 h-10 md:w-12 md:h-12" />
+            <h2 className="text-5xl md:text-6xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              My Tech Stack
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Frontend */}
+            <GlassCard className="p-8" delay={0.1}>
+              <h3 className="text-2xl font-semibold mb-6 text-purple-300">Frontend</h3>
+              <div className="flex flex-wrap gap-4">
+                {techStack.frontend.map((tech) => (
+                  <motion.div
+                    key={tech.name}
+                    initial={{ opacity: 0, scale: 0 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    whileHover={{ scale: 1.1, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer"
+                    style={{
+                      boxShadow: 'inset 0 0 20px rgba(255, 255, 255, 0.05)',
+                    }}
+                  >
+                    <img
+                      src={tech.icon}
+                      alt={tech.name}
+                      className="w-12 h-12"
+                      onError={(e) => {
+                        // Fallback if icon fails to load
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                    <span className="text-sm font-medium">{tech.name}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </GlassCard>
+
+            {/* Backend */}
+            <GlassCard className="p-8" delay={0.1}>
+              <h3 className="text-2xl font-semibold mb-6 text-purple-300">Backend</h3>
+              <div className="flex flex-wrap gap-4">
+                {techStack.backend.map((tech) => (
+                  <motion.div
+                    key={tech.name}
+                    initial={{ opacity: 0, scale: 0 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    whileHover={{ scale: 1.1, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer"
+                    style={{
+                      boxShadow: 'inset 0 0 20px rgba(255, 255, 255, 0.05)',
+                    }}
+                  >
+                    <img
+                      src={tech.icon}
+                      alt={tech.name}
+                      className="w-12 h-12"
+                      onError={(e) => {
+                        // Fallback if icon fails to load
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                    <span className="text-sm font-medium">{tech.name}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </GlassCard>
+
+
+            {/* Database */}
+            <GlassCard className="p-8" delay={0.3}>
+              <h3 className="text-2xl font-semibold mb-6 text-purple-300">Database</h3>
+              <div className="flex flex-wrap gap-4">
+                {techStack.database.map((tech) => (
+                  <motion.div
+                    key={tech.name}
+                    initial={{ opacity: 0, scale: 0 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    whileHover={{ scale: 1.1, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer"
+                    style={{
+                      boxShadow: 'inset 0 0 20px rgba(255, 255, 255, 0.05)',
+                    }}
+                  >
+                    <img
+                      src={tech.icon}
+                      alt={tech.name}
+                      className="w-12 h-12"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                    <span className="text-sm font-medium">{tech.name}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </GlassCard>
+
+            {/* Tools */}
+            <GlassCard className="p-8" delay={0.4}>
+              <h3 className="text-2xl font-semibold mb-6 text-purple-300">Tools</h3>
+              <div className="flex flex-wrap gap-4">
+                {techStack.tools.map((tech) => (
+                  <motion.div
+                    key={tech.name}
+                    initial={{ opacity: 0, scale: 0 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    whileHover={{ scale: 1.1, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer"
+                    style={{
+                      boxShadow: 'inset 0 0 20px rgba(255, 255, 255, 0.05)',
+                    }}
+                  >
+                    <img
+                      src={tech.icon}
+                      alt={tech.name}
+                      className="w-12 h-12"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                    <span className="text-sm font-medium">{tech.name}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </GlassCard>
+          </div>
         </div>
       </section>
 
       {/* Projects Section */}
       <section id="projects" className="relative py-32 px-6 z-20">
-        <div className="max-w-7xl mx-auto z-10 relative">
-          <motion.h2
+        <div className="max-w-6xl mx-auto z-10 relative">
+          <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-5xl md:text-6xl font-bold mb-16 bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
+            className="flex items-center gap-4 mb-16"
           >
-            Featured Projects
-          </motion.h2>
+            <Briefcase className="text-purple-400 w-10 h-10 md:w-12 md:h-12" />
+            <h2 className="text-5xl md:text-6xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Featured Projects
+            </h2>
+          </motion.div>
           <div className="grid md:grid-cols-2 gap-8">
             {projects.map((project, index) => (
               <GlassCard key={project.title} className="p-8 group" delay={index * 0.1}>
@@ -467,15 +637,18 @@ const Portfolio = () => {
                 />
               </div>
             </div>
-            <motion.h2
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-5xl md:text-6xl font-bold mb-8 bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
+              className="flex items-center justify-center gap-4 mb-8"
             >
-              Let's Connect
-            </motion.h2>
+              <MessageCircle className="text-purple-400 w-10 h-10 md:w-12 md:h-12" />
+              <h2 className="text-5xl md:text-6xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Let's Connect
+              </h2>
+            </motion.div>
             <motion.p
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -502,7 +675,7 @@ const Portfolio = () => {
       {/* Footer */}
       <footer className="relative py-8 px-6 border-t border-white/10 backdrop-blur-2xl bg-black/10 z-20">
         <div className="max-w-7xl mx-auto text-center text-white/50">
-          <p>© 2025 Portfolio. Crafted with passion and code.</p>
+          <p>© 2025 William. Crafted with passion and code.</p>
         </div>
       </footer>
     </motion.div>

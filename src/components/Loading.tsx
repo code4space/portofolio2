@@ -120,7 +120,7 @@ const Loading = ({ isLoading, progress = 0 }: LoadingProps) => {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden"
+          className="fixed inset-0 z-100 flex items-center justify-center overflow-hidden"
           style={{
             background: 'linear-gradient(135deg, #0a0a1f 0%, #150a2e 50%, #0a0a1f 100%)',
           }}
