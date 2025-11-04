@@ -3,9 +3,19 @@ import { useEffect, useState, useRef } from 'react';
 
 type CursorType = 'default' | 'pointer' | 'pressed';
 
+// Check if device is mobile/touch device
+const isMobileDevice = () => {
+  return (
+    'ontouchstart' in window ||
+    navigator.maxTouchPoints > 0 ||
+    (window.matchMedia && window.matchMedia('(max-width: 768px)').matches)
+  );
+};
+
 const CustomCursor = () => {
   const shouldReduceMotion = useReducedMotion();
   const cursorRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   const [cursorType, setCursorType] = useState<CursorType>('default');
   const [isHoveringButton, setIsHoveringButton] = useState(false);
@@ -13,12 +23,23 @@ const CustomCursor = () => {
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
 
+  // Check if mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(isMobileDevice());
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Direct position (no spring for instant response)
   const cursorX = mouseX;
   const cursorY = mouseY;
 
   useEffect(() => {
-    if (shouldReduceMotion) return;
+    if (shouldReduceMotion || isMobile) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
@@ -97,9 +118,9 @@ const CustomCursor = () => {
         el.removeEventListener('mouseleave', handleMouseLeave as EventListener);
       });
     };
-  }, [shouldReduceMotion, mouseX, mouseY, cursorType, isHoveringButton]);
+  }, [shouldReduceMotion, isMobile, mouseX, mouseY, cursorType, isHoveringButton]);
 
-  if (shouldReduceMotion) return null;
+  if (shouldReduceMotion || isMobile) return null;
 
   // Cursor size based on type
   const cursorSize = {
