@@ -784,7 +784,7 @@ const Portfolio = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="flex items-center justify-center gap-4 mb-8"
             >
-              <MessageCircle className="text-purple-400 w-10 h-10 md:w-12 md:h-12" />
+              <MessageCircle className="text-purple-400 w-10 h-10 md:w-12 md:h-12 md:block hidden" />
               <h2 className="text-5xl md:text-6xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                 <DecryptText speed={30} delay={200}>
                   Let's Connect
