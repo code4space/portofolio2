@@ -1,12 +1,152 @@
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
+import { AnimatePresence, motion, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion';
 import { ArrowRight, Briefcase, Code, ExternalLink, FileText, Github, Linkedin, Mail, Menu, MessageCircle, User, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import CustomCursor from './components/CustomCursor';
+import DecryptText from './components/DecryptText';
 import FluidDistortion from './components/FluidDistortion';
 import Loading from './components/Loading';
 import GlassCard from './components/glassCard';
 import SocialIcon from './components/socialIcon';
+
+// Import project images
+import adminImage from './assets/project/admin.png';
+import erpImage from './assets/project/erp.png';
+import pokemonImage from './assets/project/pokemon.png';
+import stackunImage from './assets/project/stackun.png';
+import tictactoeImage from './assets/project/tictactoe.png';
+
+interface Project {
+  title: string;
+  description: string;
+  tags: string[];
+  color: string;
+  image: string;
+  link: string;
+  year: number;
+}
+
+interface ProjectCardProps {
+  project: Project;
+  index: number;
+}
+
+const ProjectCard = ({ project, index }: ProjectCardProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const cursorX = useMotionValue(0);
+  const cursorY = useMotionValue(0);
+
+  const springConfig = { damping: 25, stiffness: 700 };
+  const xSpring = useSpring(cursorX, springConfig);
+  const ySpring = useSpring(cursorY, springConfig);
+
+  // Offset transforms to position image at bottom right of cursor
+  const imageX = useTransform(xSpring, (v) => v + 20); // 20px offset to the right
+  const imageY = useTransform(ySpring, (v) => v + 20); // 20px offset below cursor
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    cursorX.set(e.clientX);
+    cursorY.set(e.clientY);
+  };
+
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Check if the click was on the "View Project" link to avoid double navigation
+    const target = e.target as HTMLElement;
+    if (target.closest('a')) {
+      return; // Let the link handle its own click
+    }
+    window.open(project.link, '_blank', 'noopener,noreferrer');
+  };
+
+  return (
+    <>
+      <div
+        ref={cardRef}
+        className="relative cursor-pointer"
+        style={{ cursor: 'pointer' }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onMouseMove={handleMouseMove}
+        onClick={handleCardClick}
+      >
+        <GlassCard
+          className="p-8 group relative overflow-hidden"
+          delay={index * 0.1}
+        >
+          <motion.div
+            whileHover={{ y: -5 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className={`absolute inset-0 bg-linear-to-br ${project.color} opacity-0 transition-opacity duration-300 rounded-3xl`} />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-2xl font-bold">{project.title}</h3>
+                <span className="text-sm text-white/50 font-medium">{project.year}</span>
+              </div>
+              <p className="text-white/70 mb-6">{project.description}</p>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {project.tags.map(tag => (
+                  <span
+                    key={tag}
+                    className="px-3 py-1 backdrop-blur-xl bg-white/10 rounded-full text-sm border border-white/10"
+                    style={{
+                      boxShadow: 'inset 0 0 10px rgba(255, 255, 255, 0.05)',
+                    }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <motion.a
+                href={project.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ x: 5 }}
+                className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors cursor-pointer w-fit"
+              >
+                View Project <ExternalLink size={18} />
+              </motion.a>
+            </div>
+          </motion.div>
+        </GlassCard>
+      </div>
+
+      {/* Floating Image Preview */}
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="fixed pointer-events-none z-50"
+            style={{
+              left: imageX,
+              top: imageY,
+            }}
+          >
+            <motion.div
+              className="w-80 h-64 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 backdrop-blur-sm"
+              style={{
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
+              }}
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              <img
+                src={project.image}
+                alt={project.title}
+                className="w-full h-full object-cover"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+};
 
 const Portfolio = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -22,28 +162,49 @@ const Portfolio = () => {
 
   const projects = [
     {
-      title: 'E-Commerce Platform',
-      description: 'A modern e-commerce solution with real-time inventory and seamless checkout experience.',
-      tags: ['React', 'Node.js', 'MongoDB'],
+      title: 'Admin Dashboard',
+      description: 'A modern admin dashboard solution with real-time data visualization and user management.',
+      tags: ['React', 'TypeScript', 'Tailwind CSS'],
       color: 'from-purple-500 to-pink-500',
+      image: adminImage,
+      link: "https://admin-two-tau.vercel.app/",
+      year: 2024
     },
     {
-      title: 'AI Content Generator',
-      description: 'Machine learning powered content creation tool with natural language processing.',
-      tags: ['Python', 'TensorFlow', 'React'],
+      title: 'ERP System',
+      description: 'Enterprise resource planning system for managing business operations and workflows.',
+      tags: ['React', 'Node.js', 'MongoDB'],
       color: 'from-blue-500 to-cyan-500',
+      image: erpImage,
+      link: "https://demo-erp-gray.vercel.app/",
+      year: 2023
     },
     {
-      title: 'Portfolio CMS',
-      description: 'Headless CMS designed specifically for creative portfolios and agencies.',
-      tags: ['Next.js', 'GraphQL', 'Prisma'],
+      title: 'Pokemon App',
+      description: 'Interactive Pokemon application with search, filtering, and detailed information.',
+      tags: ['React', 'Vite', 'Pokemon API', 'Express JS'],
       color: 'from-orange-500 to-red-500',
+      image: pokemonImage,
+      link: "https://pokemon-collection-game.vercel.app/",
+      year: 2023
     },
     {
-      title: 'Real-time Analytics',
-      description: 'Dashboard for visualizing complex data streams with live updates and insights.',
-      tags: ['Vue.js', 'D3.js', 'WebSocket'],
+      title: 'Stackun Platform',
+      description: 'Modern platform for developers to showcase their projects and connect.',
+      tags: ['React', 'Next.js', 'GraphQL'],
       color: 'from-green-500 to-teal-500',
+      image: stackunImage,
+      link: "https://stackun.vercel.app/",
+      year: 2023
+    },
+    {
+      title: 'Tic Tac Toe Game',
+      description: 'Classic tic tac toe game with modern UI and smooth animations.',
+      tags: ['React', 'TypeScript', 'CSS'],
+      color: 'from-yellow-500 to-orange-500',
+      image: tictactoeImage,
+      link: "https://neon-tic-tac-toe.vercel.app/",
+      year: 2022
     },
   ];
 
@@ -75,6 +236,7 @@ const Portfolio = () => {
       { name: 'Git', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg' },
       { name: 'Docker', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg' },
       { name: 'Figma', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg' },
+      { name: 'Linux', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg' },
     ],
   };
 
@@ -207,7 +369,7 @@ const Portfolio = () => {
               backgroundSize: '200% auto',
             }}
           >
-            William
+            William Wijaya
           </motion.div>
 
           {/* Desktop Menu */}
@@ -394,15 +556,19 @@ const Portfolio = () => {
             <div className="flex items-center gap-4 mb-12">
               <User className="text-purple-400 w-10 h-10 md:w-12 md:h-12" />
               <h2 className="text-5xl md:text-6xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                About Me
+                <DecryptText speed={30} delay={200}>
+                  About Me
+                </DecryptText>
               </h2>
             </div>
             <GlassCard className="p-8" delay={0.1}>
               <p className="text-lg text-white/80 mb-6 leading-relaxed">
-                Hi, I'm a developer with over 2 years of experience building modern web
-                and mobile applications. I enjoy crafting clean, user-focused designs and turning
-                ideas into interactive digital experiences. I'm always exploring new technologies
-                to improve my skills and create better solutions.
+                <DecryptText speed={3} delay={50}>
+                  Hi, I'm a developer with over 2 years of experience building modern web
+                  and mobile applications. I enjoy crafting clean, user-focused designs and turning
+                  ideas into interactive digital experiences. I'm always exploring new technologies
+                  to improve my skills and create better solutions.
+                </DecryptText>
               </p>
               <motion.a
                 href="/resume"
@@ -435,7 +601,9 @@ const Portfolio = () => {
           >
             <Code className="text-purple-400 w-10 h-10 md:w-12 md:h-12" />
             <h2 className="text-5xl md:text-6xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              My Tech Stack
+              <DecryptText speed={30} delay={200}>
+                My Tech Stack
+              </DecryptText>
             </h2>
           </motion.div>
 
@@ -577,42 +745,14 @@ const Portfolio = () => {
           >
             <Briefcase className="text-purple-400 w-10 h-10 md:w-12 md:h-12" />
             <h2 className="text-5xl md:text-6xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Featured Projects
+              <DecryptText speed={30} delay={200}>
+                Featured Projects
+              </DecryptText>
             </h2>
           </motion.div>
           <div className="grid md:grid-cols-2 gap-8">
             {projects.map((project, index) => (
-              <GlassCard key={project.title} className="p-8 group" delay={index * 0.1}>
-                <motion.div
-                  whileHover={{ y: -5 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className={`absolute inset-0 bg-linear-to-br ${project.color} opacity-0 transition-opacity duration-300 rounded-3xl`} />
-                  <div className="relative z-10">
-                    <h3 className="text-2xl font-bold mb-3">{project.title}</h3>
-                    <p className="text-white/70 mb-6">{project.description}</p>
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {project.tags.map(tag => (
-                        <span
-                          key={tag}
-                          className="px-3 py-1 backdrop-blur-xl bg-white/10 rounded-full text-sm border border-white/10"
-                          style={{
-                            boxShadow: 'inset 0 0 10px rgba(255, 255, 255, 0.05)',
-                          }}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <motion.button
-                      whileHover={{ x: 5 }}
-                      className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors"
-                    >
-                      View Project <ExternalLink size={18} />
-                    </motion.button>
-                  </div>
-                </motion.div>
-              </GlassCard>
+              <ProjectCard key={project.title} project={project} index={index} />
             ))}
           </div>
         </div>
@@ -646,7 +786,9 @@ const Portfolio = () => {
             >
               <MessageCircle className="text-purple-400 w-10 h-10 md:w-12 md:h-12" />
               <h2 className="text-5xl md:text-6xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Let's Connect
+                <DecryptText speed={30} delay={200}>
+                  Let's Connect
+                </DecryptText>
               </h2>
             </motion.div>
             <motion.p
@@ -656,14 +798,16 @@ const Portfolio = () => {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="text-xl text-white/70 mb-12 max-w-2xl mx-auto"
             >
-              Have a project in mind or just want to chat? I'm always open to discussing new opportunities
-              and creative ideas.
+              <DecryptText speed={3} delay={200}>
+                Have a project in mind or just want to chat? I'm always open to discussing new opportunities
+                and creative ideas.
+              </DecryptText>
             </motion.p>
             <div className="flex justify-center gap-6">
               {[
-                { icon: Github, label: 'GitHub', href: '#' },
-                { icon: Linkedin, label: 'LinkedIn', href: '#' },
-                { icon: Mail, label: 'Email', href: 'mailto:hello@example.com' },
+                { icon: Github, label: 'GitHub', href: 'https://github.com/code4space' },
+                { icon: Linkedin, label: 'LinkedIn', href: 'https://www.linkedin.com/in/william-wijaya-2a22871b2/' },
+                { icon: Mail, label: 'Email', href: 'mailto:mauritius.william.wijaya1@gmail.com?subject=Hey!%20Let\'s%20Work%20Together%20🚀&body=Hey%20William!%0A%0AI%20came%20across%20your%20portfolio%20and%20I\'d%20love%20to%20chat%20about%20working%20together%20on%20a%20project%20or%20discussing%20a%20work%20opportunity!%0A%0ALooking%20forward%20to%20hearing%20from%20you!%20😊' },
               ].map(({ icon: Icon, label, href }) => (
                 <SocialIcon key={label} Icon={Icon} label={label} href={href} />
               ))}

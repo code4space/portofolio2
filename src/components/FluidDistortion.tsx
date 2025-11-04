@@ -75,7 +75,7 @@ const FluidDistortion = ({ className = '' }: FluidDistortionProps) => {
       const progress = maxScroll > 0 ? Math.min(scrollTop / maxScroll, 1) : 0;
 
       // Update parallax offset in ref (no re-render)
-      const maxParallax = 3;
+      const maxParallax = 2;
       parallaxRef.current = progress * maxParallax;
 
       // Handle fade-out effect for contact section

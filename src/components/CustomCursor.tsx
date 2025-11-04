@@ -1,7 +1,7 @@
 import { motion, useMotionValue, useReducedMotion } from 'framer-motion';
 import { useEffect, useState, useRef } from 'react';
 
-type CursorType = 'default' | 'pointer' | 'text' | 'pressed';
+type CursorType = 'default' | 'pointer' | 'pressed';
 
 const CustomCursor = () => {
   const shouldReduceMotion = useReducedMotion();
@@ -30,7 +30,7 @@ const CustomCursor = () => {
     };
 
     const handleMouseUp = () => {
-      setCursorType(cursorType === 'text' ? 'text' : isHoveringButton ? 'pointer' : 'default');
+      setCursorType(isHoveringButton ? 'pointer' : 'default');
     };
 
     const checkElementType = (target: HTMLElement) => {
@@ -43,30 +43,6 @@ const CustomCursor = () => {
         setCursorType('pointer');
         setIsHoveringButton(true);
         return;
-      }
-
-      // Check if text element (but not if it's inside a clickable)
-      const computedStyle = window.getComputedStyle(target);
-      const isSelectableText =
-        computedStyle.userSelect !== 'none' &&
-        computedStyle.cursor !== 'pointer' &&
-        (target.tagName === 'P' ||
-          target.tagName === 'SPAN' ||
-          target.tagName === 'H1' ||
-          target.tagName === 'H2' ||
-          target.tagName === 'H3' ||
-          target.tagName === 'H4' ||
-          target.tagName === 'H5' ||
-          target.tagName === 'H6' ||
-          target.tagName === 'LI' ||
-          (target.tagName === 'DIV' && target.textContent && target.textContent.trim().length > 0));
-
-      if (isSelectableText) {
-        setCursorType('text');
-        setIsHoveringButton(false);
-      } else {
-        setCursorType('default');
-        setIsHoveringButton(false);
       }
     };
 
@@ -133,9 +109,6 @@ const CustomCursor = () => {
     pressed: 6,
   }[cursorType];
 
-  // Cursor shape for text (vertical line)
-  const isTextCursor = cursorType === 'text';
-
   return (
     <>
       {/* Hide default cursor */}
@@ -171,7 +144,7 @@ const CustomCursor = () => {
                 width: cursorSize,
                 height: cursorSize,
                 borderRadius: '50%',
-                scale: isHoveringButton ? 1.2 : 1,
+                scale: isHoveringButton ? 1.5 : 1,
               },
               text: {
                 width: 2,
@@ -200,29 +173,27 @@ const CustomCursor = () => {
               style={{
                 width: '100%',
                 height: '100%',
-                borderRadius: isTextCursor ? '2px' : '50%',
+                borderRadius: '50%',
               }}
             />
           </motion.div>
 
 
           {/* Magnetic ring effect for buttons */}
-          {!isTextCursor && (
-            <motion.div
-              className="absolute border-2 border-white/50 rounded-full"
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-              style={{
-                left: isHoveringButton ? 0 : '-150%',
-                top: isHoveringButton ? 0 : '-150%',
-                width: isHoveringButton ? 0 : cursorSize * 4,
-                height: isHoveringButton ? 0 : cursorSize * 4,
-              }}
-            />
-          )}
+          <motion.div
+            className="absolute border-2 border-white/50 rounded-full"
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+            style={{
+              left: isHoveringButton ? 0 : '-150%',
+              top: isHoveringButton ? 0 : '-150%',
+              width: isHoveringButton ? 0 : cursorSize * 4,
+              height: isHoveringButton ? 0 : cursorSize * 4,
+            }}
+          />
         </motion.div>
       </motion.div>
     </>
