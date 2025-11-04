@@ -462,7 +462,7 @@ const Portfolio = () => {
             transition={{ duration: 0.8 }}
           >
             <motion.h1
-              className="text-6xl md:text-8xl font-bold mb-6 "
+              className="text-6xl md:text-8xl font-bold mb-6 text-center"
               animate={{
                 backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
               }}
