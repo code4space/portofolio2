@@ -7,7 +7,6 @@ type CursorType = 'default' | 'pointer' | 'pressed';
 const isMobileDevice = () => {
   return (
     'ontouchstart' in window ||
-    navigator.maxTouchPoints > 0 ||
     (window.matchMedia && window.matchMedia('(max-width: 768px)').matches)
   );
 };
@@ -16,6 +15,9 @@ const CustomCursor = () => {
   const shouldReduceMotion = useReducedMotion();
   const cursorRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
+  console.log('ontouchstart' in window,"'ontouchstart' in window");
+  console.log(navigator.maxTouchPoints,'maxTouchPoints');
+  console.log(window.matchMedia('(max-width: 768px)').matches,'matches');
 
   const [cursorType, setCursorType] = useState<CursorType>('default');
   const [isHoveringButton, setIsHoveringButton] = useState(false);

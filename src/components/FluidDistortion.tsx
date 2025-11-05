@@ -2,10 +2,9 @@ import { useGLTF } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { EffectComposer } from '@react-three/postprocessing';
 import { Fluid } from '@whatisjery/react-fluid-distortion';
-import { Suspense, useEffect, useRef } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
-// Use public asset path so relative paths in GLTF resolve correctly
 const model3D = '/assets/stylized_planet/scene.gltf';
 
 interface FluidDistortionProps {
@@ -67,6 +66,20 @@ const Scene3D = ({ parallaxRef }: { parallaxRef: React.MutableRefObject<number> 
 // === Main FluidDistortion component ===
 const FluidDistortion = ({ className = '' }: FluidDistortionProps) => {
   const parallaxRef = useRef(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const isTouchDevice = 'ontouchstart' in window ;
+      const isSmallScreen = window.innerWidth < 768;
+      setIsMobile(isTouchDevice || isSmallScreen);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const calculateScroll = () => {
@@ -116,29 +129,31 @@ const FluidDistortion = ({ className = '' }: FluidDistortionProps) => {
       gl={{
         alpha: true,
         antialias: true,
-        powerPreference: 'high-performance', // better GPU scheduling
+        powerPreference: 'high-performance', 
       }}
       camera={{ position: [0, 0, 2], fov: 75 }}
-      performance={{ min: 0.5 }} // dynamic resolution scaling
+      performance={{ min: 0.5 }}
     >
       <Scene3D parallaxRef={parallaxRef} />
 
-      <EffectComposer>
-        <Fluid
-          fluidColor="#667eea"
-          showBackground={false}
-          intensity={5}
-          force={1}
-          distortion={2}
-          radius={0.3}
-          curl={10}
-          swirl={10}
-          velocityDissipation={0.99}
-          densityDissipation={0.95}
-          pressure={0.3}
-          rainbow={true}
-        />
-      </EffectComposer>
+      {!isMobile && (
+        <EffectComposer>
+          <Fluid
+            fluidColor="#667eea"
+            showBackground={false}
+            intensity={5}
+            force={1}
+            distortion={2}
+            radius={0.3}
+            curl={10}
+            swirl={10}
+            velocityDissipation={0.99}
+            densityDissipation={0.95}
+            pressure={0.3}
+            rainbow={true}
+          />
+        </EffectComposer>
+      )}
     </Canvas>
   );
 };
