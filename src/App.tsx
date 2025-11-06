@@ -8,6 +8,7 @@ import FluidDistortion from './components/FluidDistortion';
 import Loading from './components/Loading';
 import GlassCard from './components/glassCard';
 import SocialIcon from './components/socialIcon';
+import logo from './assets/w.png';
 
 // Import project images
 import adminImage from './assets/project/admin.png';
@@ -20,7 +21,6 @@ interface Project {
   title: string;
   description: string;
   tags: string[];
-  color: string;
   image: string;
   link: string;
   year: number;
@@ -33,6 +33,7 @@ interface ProjectCardProps {
 
 const ProjectCard = ({ project, index }: ProjectCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const cursorX = useMotionValue(0);
@@ -46,9 +47,22 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
   const imageX = useTransform(xSpring, (v) => v + 20); // 20px offset to the right
   const imageY = useTransform(ySpring, (v) => v + 20); // 20px offset below cursor
 
+  // Check if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    cursorX.set(e.clientX);
-    cursorY.set(e.clientY);
+    if (!isMobile) {
+      cursorX.set(e.clientX);
+      cursorY.set(e.clientY);
+    }
   };
 
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -64,7 +78,7 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
     <>
       <div
         ref={cardRef}
-        className="relative cursor-pointer"
+        className="relative cursor-pointer break-inside-avoid mb-8"
         style={{ cursor: 'pointer' }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -79,7 +93,7 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
             whileHover={{ y: -5 }}
             transition={{ duration: 0.3 }}
           >
-            <div className={`absolute inset-0 bg-linear-to-br ${project.color} opacity-0 transition-opacity duration-300 rounded-3xl`} />
+            <div className={`absolute inset-0 bg-linear-to-br opacity-0 transition-opacity duration-300 rounded-3xl`} />
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-2xl font-bold">{project.title}</h3>
@@ -113,37 +127,39 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
         </GlassCard>
       </div>
 
-      {/* Floating Image Preview */}
-      <AnimatePresence>
-        {isHovered && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="fixed pointer-events-none z-50"
-            style={{
-              left: imageX,
-              top: imageY,
-            }}
-          >
+      {/* Floating Image Preview - Only on desktop */}
+      {!isMobile && (
+        <AnimatePresence>
+          {isHovered && (
             <motion.div
-              className="w-80 h-64 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 backdrop-blur-sm"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="fixed pointer-events-none z-50"
               style={{
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
+                left: imageX,
+                top: imageY,
               }}
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
             >
-              <img
-                src={project.image}
-                alt={project.title}
-                className="w-full h-full object-cover"
-              />
+              <motion.div
+                className="w-80 h-64 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 backdrop-blur-sm"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
+                }}
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      )}
     </>
   );
 };
@@ -154,6 +170,7 @@ const Portfolio = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const { scrollYProgress } = useScroll();
+
   const backgroundColor = useTransform(
     scrollYProgress,
     [0, 0.5, 1],
@@ -172,36 +189,32 @@ const Portfolio = () => {
     },
     {
       title: 'ERP System',
-      description: 'Enterprise resource planning system for managing business operations and workflows.',
+      description: 'Enterprise resource planning system for managing business operations and workflows. With complete features for inputting and managing data and reporting.',
       tags: ['React', 'Node.js', 'MongoDB'],
-      color: 'from-blue-500 to-cyan-500',
       image: erpImage,
       link: "https://demo-erp-gray.vercel.app/",
       year: 2023
     },
     {
-      title: 'Pokemon App',
-      description: 'Interactive Pokemon application with search, filtering, and detailed information.',
-      tags: ['React', 'Vite', 'Pokemon API', 'Express JS'],
-      color: 'from-orange-500 to-red-500',
+      title: 'Pokemon Game',
+      description: 'Interactive Pokemon game with online mode and local mode, gacha and battle system.',
+      tags: ['React', 'Vite', 'Pokemon API', 'Express JS', 'WebSocket', 'MongoDB'],
       image: pokemonImage,
       link: "https://pokemon-collection-game.vercel.app/",
       year: 2023
     },
     {
       title: 'Stackun Platform',
-      description: 'Modern platform for developers to showcase their projects and connect.',
-      tags: ['React', 'Next.js', 'GraphQL'],
-      color: 'from-green-500 to-teal-500',
+      description: 'Sliding puzzle game with modern UI and smooth animations.',
+      tags: ['React', 'TypeScript', 'CSS'],
       image: stackunImage,
-      link: "https://stackun.vercel.app/",
-      year: 2023
+      link: "https://neon-tic-tac-toe.vercel.app/",
+      year: 2022
     },
     {
-      title: 'Tic Tac Toe Game',
-      description: 'Classic tic tac toe game with modern UI and smooth animations.',
+      title: 'Tic Tac Toe',
+      description: 'Classic tic tac toe game with modern neon UI and smooth animations. This is a simple game that can be played by two players.',
       tags: ['React', 'TypeScript', 'CSS'],
-      color: 'from-yellow-500 to-orange-500',
       image: tictactoeImage,
       link: "https://neon-tic-tac-toe.vercel.app/",
       year: 2022
@@ -364,12 +377,13 @@ const Portfolio = () => {
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="text-2xl font-bold bg-linear-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent"
+            className="text-2xl font-bold bg-linear-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent flex gap-2"
             style={{
               backgroundSize: '200% auto',
             }}
           >
-            William Wijaya
+            <img src={logo} alt="logo" width={32} height={32} />
+            William.
           </motion.div>
 
           {/* Desktop Menu */}
@@ -484,7 +498,7 @@ const Portfolio = () => {
               transition={{ delay: 0.3 }}
               className="text-xl md:text-2xl text-white/70 mb-8 max-w-2xl mx-auto text-center"
             >
-              Crafting immersive digital experiences with cutting-edge technology and innovative design
+              Designing with logic. Building with style
             </motion.p>
             <motion.div
               initial={{ opacity: 0 }}
@@ -562,12 +576,16 @@ const Portfolio = () => {
               </h2>
             </div>
             <GlassCard className="p-8" delay={0.1}>
+              <div className='w-full flex items-center gap-2 mb-4'>
+                <b className='text-purple-200 text-sm'>Where creativity meets code</b>
+                <span className='flex-1 h-px bg-purple-200'></span>
+              </div>
               <p className="text-lg text-white/80 mb-6 leading-relaxed">
                 <DecryptText speed={3} delay={50}>
-                  Hi, I'm a developer with over 2 years of experience building modern web
-                  and mobile applications. I enjoy crafting clean, user-focused designs and turning
-                  ideas into interactive digital experiences. I'm always exploring new technologies
-                  to improve my skills and create better solutions.
+                  Hi, I'm a fullstack developer and designer with over 2 years of experience
+                  building modern web and mobile applications. I love blending design and technology
+                  to craft clean, engaging, and user-centered digital experiences. Always curious and
+                  driven to learn, I explore new tools and ideas to push my work—and myself—further every day.
                 </DecryptText>
               </p>
               <motion.a
@@ -619,7 +637,7 @@ const Portfolio = () => {
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
                     whileHover={{ scale: 1.1, y: -5 }}
-                    className="flex flex-col items-center gap-2 p-4 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer"
+                    className="flex min-w-28 flex-1 flex-col items-center gap-2 p-4 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer"
                     style={{
                       boxShadow: 'inset 0 0 20px rgba(255, 255, 255, 0.05)',
                     }}
@@ -650,7 +668,7 @@ const Portfolio = () => {
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
                     whileHover={{ scale: 1.1, y: -5 }}
-                    className="flex flex-col items-center gap-2 p-4 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer"
+                    className="flex min-w-28 flex-1 flex-col items-center gap-2 p-4 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer"
                     style={{
                       boxShadow: 'inset 0 0 20px rgba(255, 255, 255, 0.05)',
                     }}
@@ -682,7 +700,7 @@ const Portfolio = () => {
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
                     whileHover={{ scale: 1.1, y: -5 }}
-                    className="flex flex-col items-center gap-2 p-4 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer"
+                    className="flex min-w-28 flex-1 flex-col items-center gap-2 p-4 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer"
                     style={{
                       boxShadow: 'inset 0 0 20px rgba(255, 255, 255, 0.05)',
                     }}
@@ -712,7 +730,7 @@ const Portfolio = () => {
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
                     whileHover={{ scale: 1.1, y: -5 }}
-                    className="flex flex-col items-center gap-2 p-4 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer"
+                    className="flex min-w-28 flex-1 flex-col items-center gap-2 p-4 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer"
                     style={{
                       boxShadow: 'inset 0 0 20px rgba(255, 255, 255, 0.05)',
                     }}
@@ -750,7 +768,7 @@ const Portfolio = () => {
               </DecryptText>
             </h2>
           </motion.div>
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="columns-1 gap-8 md:columns-2" >
             {projects.map((project, index) => (
               <ProjectCard key={project.title} project={project} index={index} />
             ))}

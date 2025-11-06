@@ -11,6 +11,7 @@ html {
   background: #150a2e;
 }
 
+
 ::-webkit-scrollbar-track {
   background: #150a2e;
   backdrop-filter: blur(10px);
@@ -30,5 +31,5 @@ html {
 /* Firefox Scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #202063 #150a2e;
+  scrollbar-color: #202063 rgb(10, 10, 31);
 }
