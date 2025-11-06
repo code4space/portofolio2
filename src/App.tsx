@@ -8,7 +8,7 @@ import FluidDistortion from './components/FluidDistortion';
 import Loading from './components/Loading';
 import GlassCard from './components/glassCard';
 import SocialIcon from './components/socialIcon';
-import logo from './assets/w.png';
+import logo from './assets/W.png';
 
 // Import project images
 import adminImage from './assets/project/admin.png';
